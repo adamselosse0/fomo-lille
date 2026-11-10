@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scores — FOMO · Lille</title>
+<meta name="description" content="Classements échecs et fléchettes du FOMO, bar de soif entre copains, 10 rue des Fossés à Lille.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  :root{--teal:#0B7A5E;--teal-deep:#075A45;--coral:#FF7443;--coral-ink:#C2441A;--shadow:#5B2412;--cream:#FFF4E6;--paper:#FFFFFF;--ink:#1D1B18;--muted:#5E5850;--radius:22px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+  .display{font-family:"Titan One",Archivo,sans-serif;font-weight:400;letter-spacing:.01em;line-height:.95}
+  .label{font-stretch:75%;font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:14px}
+  .wordmark{font-family:"Titan One",sans-serif;color:var(--coral);text-shadow:3px 3px 0 var(--shadow);letter-spacing:.04em;text-decoration:none}
+
+  header{position:sticky;top:0;z-index:20;background:var(--teal);color:#fff;border-bottom:3px solid var(--teal-deep)}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+  .nav .wordmark{font-size:30px}
+  .nav ul{display:flex;gap:6px;list-style:none;margin:0;padding:0;flex-wrap:wrap}
+  .nav ul a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;text-decoration:none;font-weight:700;font-stretch:85%;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
+  .nav ul a:hover{background:var(--teal-deep)}
+  .nav ul a[aria-current="page"]{background:var(--coral);color:var(--ink)}
+  .burger{display:none;min-height:44px;min-width:44px;border:2px solid #fff;background:transparent;color:#fff;border-radius:12px;font:inherit;font-weight:800;cursor:pointer}
+  @media (max-width:820px){
+    .burger{display:inline-flex;align-items:center;justify-content:center;padding:0 14px}
+    .nav ul{display:none;position:absolute;left:0;right:0;top:100%;background:var(--teal);flex-direction:column;padding:12px 24px 20px;border-bottom:3px solid var(--teal-deep)}
+    .nav ul.open{display:flex}
+  }
+
+  .hero{background:var(--teal);color:#fff;padding:64px 0 72px}
+  .hero h1{margin:10px 0 0;font-size:clamp(56px,10vw,120px);color:var(--coral);text-shadow:5px 5px 0 var(--shadow)}
+  .hero p{margin:18px 0 0;font-size:20px;max-width:36rem;color:#E6F4EE}
+  .checker{height:44px;background-color:var(--ink);background-image:conic-gradient(var(--cream) 25%,transparent 0 50%,var(--cream) 0 75%,transparent 0);background-size:44px 44px}
+
+  main .wrap{padding-top:56px;padding-bottom:96px}
+  .demo{display:none;margin:0 0 28px;padding:16px 20px;border-radius:16px;border:2px dashed var(--coral-ink);background:#FFE6DA;color:#7a2a0f;font-weight:700}
+  .demo.on{display:block}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
+  .tab{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:inherit;font-weight:800;font-stretch:85%;letter-spacing:.06em;text-transform:uppercase;font-size:15px;cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
+  .tab[aria-selected="true"]{background:var(--coral)}
+  .tab svg{flex:0 0 auto}
+
+  .podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:end;margin-bottom:36px}
+  .step{border:2px solid var(--ink);border-radius:var(--radius);background:var(--paper);padding:24px;text-align:center;box-shadow:5px 5px 0 var(--ink)}
+  .step .pos{font-family:"Titan One",sans-serif;font-size:44px;line-height:1}
+  .step .who{margin-top:10px;font-weight:800;font-size:20px;overflow-wrap:anywhere}
+  .step .pts{margin-top:4px;color:var(--muted);font-weight:700}
+  .step.p1{background:var(--coral);padding-top:44px;padding-bottom:44px}
+  .step.p1 .pts{color:var(--ink)}
+  .step.p2{padding-top:32px;padding-bottom:32px}
+  .step.p1{order:2}.step.p2{order:1}.step.p3{order:3}
+  @media (max-width:640px){.podium{grid-template-columns:1fr}.step.p1,.step.p2,.step.p3{order:0;padding:22px}}
+
+  .board{background:var(--paper);border:2px solid var(--ink);border-radius:24px;overflow:hidden;box-shadow:6px 6px 0 var(--teal-deep)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:520px}
+  caption{text-align:left;padding:20px 24px 0;font-weight:800;font-size:18px}
+  th,td{padding:14px 16px;text-align:right;white-space:nowrap}
+  th:first-child,td:first-child{text-align:center;width:64px}
+  th:nth-child(2),td:nth-child(2){text-align:left;white-space:normal}
+  thead th{font-stretch:80%;font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:13px;color:var(--teal-deep);border-bottom:2px solid var(--teal)}
+  tbody tr{border-bottom:1px dashed #D9D2C7}
+  tbody tr:last-child{border-bottom:0}
+  tbody tr:nth-child(-n+3) td:first-child{font-family:"Titan One",sans-serif;color:var(--coral-ink);font-size:20px}
+  td.pts{font-weight:800;color:var(--teal-deep);font-size:18px}
+  td.name{font-weight:700}
+  .rules{padding:18px 24px;background:var(--cream);color:var(--muted);font-size:15px;border-top:2px solid var(--ink)}
+  .updated{margin-top:18px;color:var(--muted);font-size:15px}
+
+  .join{margin-top:56px;background:var(--teal);color:#fff;border-radius:28px;padding:clamp(28px,5vw,56px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:24px;border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink)}
+  .join h2{margin:0;font-size:clamp(32px,4.5vw,52px);color:var(--coral);text-shadow:3px 3px 0 var(--shadow)}
+  .join p{margin:12px 0 0;max-width:32rem;color:#E6F4EE}
+  .btn{display:inline-flex;align-items:center;min-height:52px;padding:0 26px;border-radius:999px;font-weight:800;font-stretch:90%;text-transform:uppercase;letter-spacing:.05em;font-size:15px;text-decoration:none;background:var(--coral);color:var(--ink);box-shadow:4px 4px 0 var(--shadow)}
+
+  footer{background:var(--ink);color:#fff;padding:48px 0 36px}
+  .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;align-items:flex-end}
+  .foot nav{display:flex;flex-wrap:wrap;gap:8px 22px}
+  .foot nav a{text-decoration:none;font-weight:700}
+  .fine{margin-top:28px;padding-top:18px;border-top:1px solid #3a3733;color:#B8B1A6;font-size:14px}
+  :focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="wordmark" aria-label="FOMO, accueil">FOMO</a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="menu-nav" id="burger">Menu</button>
+    <ul id="menu-nav">
+      <li><a href="index.html#carte">La carte</a></li>
+      <li><a href="index.html#esprit">L’esprit</a></li>
+      <li><a href="index.html#events">Events</a></li>
+      <li><a href="scores.html" aria-current="page">Scores</a></li>
+      <li><a href="index.html#infos">Venir</a></li>
+    </ul>
+  </div>
+</header>
+
+<section class="hero" aria-labelledby="t">
+  <div class="wrap">
+    <span class="label">Le tableau des scores</span>
+    <h1 id="t" class="display">Qui règne au FOMO ?</h1>
+    <p>Échiquiers et cibles : voici les classements de la maison. Tu n’y es pas encore ? Il n’y a qu’une solution, venir jouer.</p>
+  </div>
+</section>
+<div class="checker" aria-hidden="true"></div>
+
+<main>
+  <div class="wrap">
+    <p class="demo" id="demo">Classement de démonstration : les vrais résultats arrivent bientôt.</p>
+
+    <div class="tabs" role="tablist" aria-label="Choisir le classement">
+      <button class="tab" role="tab" id="tab-echecs" aria-controls="panel" aria-selected="true" data-game="echecs">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M9 17h6l1 4H8z"/><path d="M10 17c0-3-2-4-2-7a4 4 0 0 1 8 0c0 3-2 4-2 7"/><path d="M12 3v3M10.5 4.5h3"/></svg>
+        Échecs
+      </button>
+      <button class="tab" role="tab" id="tab-flechettes" aria-controls="panel" aria-selected="false" tabindex="-1" data-game="flechettes">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/><path d="M12 12l7-7M17 3l2 2 2-1-1 2 2 2"/></svg>
+        Fléchettes
+      </button>
+    </div>
+
+    <div id="panel" role="tabpanel" aria-labelledby="tab-echecs">
+      <div class="podium" id="podium"></div>
+      <div class="board">
+        <div class="scroll">
+          <table>
+            <caption id="caption"></caption>
+            <thead id="thead"></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="rules" id="rules"></div>
+      </div>
+      <p class="updated" id="updated"></p>
+    </div>
+
+    <div class="join">
+      <div>
+        <h2 class="display">Envie d’entrer au classement ?</h2>
+        <p>Les tournois et soirées jeux sont annoncés sur Instagram, et les inscriptions passent par notre Linktree.</p>
+      </div>
+      <a class="btn" href="https://linktr.ee/fomo.lille">S’inscrire</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <a href="index.html" class="wordmark" style="font-size:56px;line-height:1">FOMO</a>
+      <nav aria-label="Liens du pied de page">
+        <a href="index.html#carte">La carte</a>
+        <a href="index.html#events">Events</a>
+        <a href="scores.html">Scores</a>
+        <a href="index.html#infos">Infos</a>
+        <a href="https://www.instagram.com/fomo.lille/">Instagram</a>
+      </nav>
+    </div>
+    <p class="fine">FOMO · 10 rue des Fossés, 59800 Lille · L’abus d’alcool est dangereux pour la santé, à consommer avec modération.</p>
+  </div>
+</footer>
+
+<script src="scores.js"></script>
+<script>
+(function(){
+  var data = window.FOMO_SCORES || {};
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panel = document.getElementById('panel');
+
+  if (data.demo) document.getElementById('demo').classList.add('on');
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  var games = {
+    echecs: {
+      title: 'Classement échecs',
+      cols: ['#', 'Joueur', 'Parties', 'V', 'N', 'D', 'Points'],
+      points: function(j){ return (j.v||0)*3 + (j.n||0); },
+      row: function(j){ var p=(j.v||0)+(j.n||0)+(j.d||0); return [p, j.v||0, j.n||0, j.d||0]; },
+      tiebreak: function(a,b){ return (b.v||0)-(a.v||0); }
+    },
+    flechettes: {
+      title: 'Classement fléchettes',
+      cols: ['#', 'Joueur', 'Matchs', 'V', 'D', 'Meilleur finish', 'Points'],
+      points: function(j){ return (j.v||0)*2; },
+      row: function(j){ return [(j.v||0)+(j.d||0), j.v||0, j.d||0, j.finish ? j.finish : '—']; },
+      tiebreak: function(a,b){ return (b.finish||0)-(a.finish||0); }
+    }
+  };
+
+  function render(key){
+    var g = games[key], src = (data[key] && data[key].joueurs) || [];
+    var list = src.map(function(j){ return { j: j, pts: g.points(j) }; })
+      .sort(function(a,b){ return (b.pts-a.pts) || g.tiebreak(a.j,b.j) || String(a.j.nom).localeCompare(String(b.j.nom)); });
+
+    // rangs avec ex aequo
+    var rank = 0, prev = null;
+    list.forEach(function(x, i){ if (x.pts !== prev) { rank = i+1; prev = x.pts; } x.rank = rank; });
+
+    var pod = '';
+    ['p1','p2','p3'].forEach(function(cls, i){
+      var x = list[i];
+      if (!x) return;
+      pod += '<div class="step '+cls+'"><div class="pos">'+x.rank+(x.rank===1?'er':'e')+'</div><div class="who">'+esc(x.j.nom)+'</div><div class="pts">'+x.pts+' pts</div></div>';
+    });
+    document.getElementById('podium').innerHTML = pod;
+
+    document.getElementById('caption').textContent = g.title;
+    document.getElementById('thead').innerHTML = '<tr>' + g.cols.map(function(c){ return '<th scope="col">'+c+'</th>'; }).join('') + '</tr>';
+    document.getElementById('tbody').innerHTML = list.length ? list.map(function(x){
+      return '<tr><td>'+x.rank+'</td><td class="name">'+esc(x.j.nom)+'</td>' +
+        g.row(x.j).map(function(v){ return '<td>'+esc(v)+'</td>'; }).join('') +
+        '<td class="pts">'+x.pts+'</td></tr>';
+    }).join('') : '<tr><td colspan="'+g.cols.length+'" style="text-align:center;padding:32px">Pas encore de résultats, le premier tournoi arrive !</td></tr>';
+
+    document.getElementById('rules').textContent = (data[key] && data[key].regle) || '';
+    document.getElementById('updated').textContent = data.miseAJour ? 'Mis à jour le ' + data.miseAJour + '.' : '';
+  }
+
+  function select(tab, focus){
+    tabs.forEach(function(t){ var on = t===tab; t.setAttribute('aria-selected', on?'true':'false'); t.tabIndex = on?0:-1; });
+    panel.setAttribute('aria-labelledby', tab.id);
+    render(tab.getAttribute('data-game'));
+    try { history.replaceState(null, '', '#' + tab.getAttribute('data-game')); } catch(e) {}
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ select(t); });
+    t.addEventListener('keydown', function(e){
+      if (e.key==='ArrowRight'||e.key==='ArrowLeft'){ e.preventDefault(); select(tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length], true); }
+    });
+  });
+  var start = location.hash === '#flechettes' ? tabs[1] : tabs[0];
+  select(start);
+
+  var burger = document.getElementById('burger'), nav = document.getElementById('menu-nav');
+  burger.addEventListener('click', function(){ var o = nav.classList.toggle('open'); burger.setAttribute('aria-expanded', o?'true':'false'); });
+})();
+</script>
+</body>
+</html>
