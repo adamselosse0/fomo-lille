@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://adamselosse0.github.io/fomo-lille/"
-VERSION = "4"
+VERSION = "5"
 
 NAV = [
     ("index.html", "Accueil", "accueil"),
@@ -205,7 +205,41 @@ page("index.html", "accueil",
 page("carte.html", "carte",
      "La carte — FOMO · Bar à Lille",
      "La carte complète du FOMO à Lille : bières dont la Super FOMO à 3 €, vins, cocktails, spritz, mocktails, shots, softs et planches apéritives.",
-     hero("La carte", "Qu’est-ce qu’on boit ?", "Toute la carte, avec les prix. Elle bouge de temps en temps : ce qui est indiqué ici est toujours à jour.") +
+     """<section class="pour" id="pour" aria-labelledby="pour-t">
+  <div class="pour-stage">
+    <div class="pour-lines" aria-live="off">
+      <div class="pour-line on"><span class="label">La carte du FOMO</span><h1 class="display" id="pour-t">Une petite soif&nbsp;?</h1></div>
+      <div class="pour-line"><span class="label">Notre pils maison</span><p class="display">La Super FOMO</p><p class="sub"><span id="pour-pils">3 €</span> le demi</p></div>
+      <div class="pour-line"><span class="label">Mojito, Margarita, Spritz…</span><p class="display">Des cocktails</p><p class="sub">dès <span id="pour-cocktail">8 €</span></p></div>
+      <div class="pour-line"><span class="label">Saucissons, tartinables, cheddar</span><p class="display">De quoi grignoter</p><p class="sub">dès <span id="pour-food">6 €</span></p></div>
+      <div class="pour-line"><span class="label">Bières, vins, cocktails, softs, planches</span><p class="display">Toute la carte</p><p class="sub">juste en dessous</p></div>
+    </div>
+    <div class="glass-wrap" aria-hidden="true">
+      <svg class="glass" viewBox="0 0 200 320" width="200" height="320">
+        <defs>
+          <clipPath id="glass-clip"><path d="M28 22 H172 L152 292 Q151 302 140 302 H60 Q49 302 48 292 Z"/></clipPath>
+          <linearGradient id="beer-g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFC24B"/><stop offset="1" stop-color="#E8901C"/></linearGradient>
+        </defs>
+        <rect class="stream" x="94" y="-40" width="12" height="0" rx="6" fill="#FFC24B"/>
+        <g clip-path="url(#glass-clip)">
+          <rect x="0" y="0" width="200" height="320" fill="rgba(255,255,255,.10)"/>
+          <rect class="beer" x="0" y="302" width="200" height="320" fill="url(#beer-g)"/>
+          <g class="bubbles" fill="rgba(255,255,255,.75)">
+            <circle cx="70" cy="290" r="3"/><circle cx="96" cy="290" r="2"/><circle cx="118" cy="290" r="3.5"/><circle cx="140" cy="290" r="2"/><circle cx="84" cy="290" r="2.5"/><circle cx="128" cy="290" r="2"/>
+          </g>
+          <g class="foam" fill="#FFF8EC"><rect x="0" y="0" width="200" height="0"/></g>
+        </g>
+        <g class="foam-top" fill="#FFF8EC"><circle cx="46" cy="24" r="16"/><circle cx="74" cy="16" r="20"/><circle cx="106" cy="13" r="22"/><circle cx="138" cy="17" r="20"/><circle cx="162" cy="25" r="15"/></g>
+        <path d="M28 22 H172 L152 292 Q151 302 140 302 H60 Q49 302 48 292 Z" fill="none" stroke="#FFF4E6" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M44 48 L60 270" stroke="rgba(255,255,255,.45)" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <a class="pour-skip" href="#carte-debut">Passer à la carte <span aria-hidden="true">↓</span></a>
+    <div class="pour-bar" aria-hidden="true"><span></span></div>
+  </div>
+</section>
+<div class="checker" aria-hidden="true" id="carte-debut"></div>
+""" +
      f"""<nav class="chips" aria-label="Rubriques de la carte"><div class="wrap chips-inner" id="chips"></div></nav>
 <div class="wrap" style="padding-bottom:96px">
   <div id="menu"><div class="family"><div class="menu-grid">{sk(4, 320)}</div></div></div>

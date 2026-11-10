@@ -99,15 +99,6 @@
     hideLoader();
   }
 
-  observeReveal();
-  setTimeout(function () { document.querySelectorAll('.reveal').forEach(function (e) { e.classList.add('in'); }); }, 3000);
-
-  var cached = store(CACHE_KEY);
-  if (cached) render(cached);
-  fetchAll()
-    .then(function (d) { store(CACHE_KEY, d); render(d); })
-    .catch(function () { if (!cached) fallback().then(render).catch(hideLoader); });
-
   /* ---------- Éléments communs ---------- */
   function renderCommon(s) {
     var ann = $('.announce');
@@ -140,17 +131,18 @@
         '<div class="menu-grid">' + byFam[f].map(function (sec) {
           var two = !!(sec.col1 || sec.col2);
           var items = (sec.menu_items || []).map(function (it) {
-            var prices = it.price_text
-              ? '<span class="p">' + esc(it.price_text) + '</span>'
-              : '<span class="p">' + euro(it.price1) + '</span>' + (two ? '<span class="p">' + euro(it.price2) + '</span>' : '');
+            var prices;
+            if (it.price_text) prices = '<span class="p">' + esc(it.price_text) + '</span>';
+            else if (two && it.price2 != null) prices = '<span class="p"><em>' + esc(sec.col1 || '') + '</em>' + euro(it.price1) + '</span><span class="p"><em>' + esc(sec.col2 || '') + '</em>' + euro(it.price2) + '</span>';
+            else prices = '<span class="p">' + euro(it.price1) + '</span>';
+            var sub = [it.detail, it.volume].filter(Boolean).map(esc).join(' · ');
             return '<div class="mrow' + (it.highlight ? ' hl' : '') + (it.available ? '' : ' off') + '">' +
-              '<span class="n">' + esc(it.name) + (it.detail ? ' <small>' + esc(it.detail) + '</small>' : '') + '</span>' +
-              (it.volume ? '<span class="v">' + esc(it.volume) + '</span>' : '') + prices + '</div>';
+              '<span class="n">' + esc(it.name) + '</span>' + (sub ? '<span class="d">' + sub + '</span>' : '') +
+              '<span class="ps">' + prices + (it.available ? '' : '<span class="out">Épuisé</span>') + '</span></div>';
           }).join('');
           var note = sec.note || '';
           if (/cocktail personnalis/i.test(note)) { tip = note; note = ''; }
           return '<article class="card menu-card reveal"><h3>' + esc(sec.name) + '</h3>' +
-            (two ? '<div class="mcols"><span>' + esc(sec.col1 || '') + '</span><span>' + esc(sec.col2 || '') + '</span></div>' : '') +
             items + (note ? '<p class="menu-note">' + esc(note) + '</p>' : '') + '</article>';
         }).join('') + '</div></section>';
     }).join('') + (tip ? '<p class="menu-tip reveal">' + esc(tip) + '</p>' : '');
@@ -165,7 +157,19 @@
       }, { rootMargin: '-45% 0px -50% 0px' });
       document.querySelectorAll('.family').forEach(function (f) { io.observe(f); });
     }
-    if (location.hash) { var el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); }
+    function minPrice(filter) {
+      var m = null;
+      (d.menu || []).forEach(function (sec) { if (!filter(sec)) return; (sec.menu_items || []).forEach(function (i) { if (i.available && i.price1 != null && (m === null || i.price1 < m)) m = Number(i.price1); }); });
+      return m;
+    }
+    var pils = null;
+    (d.menu || []).forEach(function (sec) { (sec.menu_items || []).forEach(function (i) { if (i.detail === 'Super FOMO') pils = i; }); });
+    if (pils && $('#pour-pils')) $('#pour-pils').textContent = euro(pils.price1);
+    var mc = minPrice(function (sec) { return sec.name === 'Cocktails'; });
+    if (mc != null && $('#pour-cocktail')) $('#pour-cocktail').textContent = euro(mc);
+    var mf = minPrice(function (sec) { return sec.family === 'À grignoter'; });
+    if (mf != null && $('#pour-food')) $('#pour-food').textContent = euro(mf);
+    if (location.hash && location.hash !== '#carte-debut') { var el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); }
   };
 
   var MONTHS = ['janv.', 'févr.', 'mars', 'avril', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
@@ -276,4 +280,49 @@
     select(location.hash === '#flechettes' && !tabs[0].dataset.started ? tabs[1] : (current || tabs[0]));
     tabs[0].dataset.started = '1';
   };
+
+  /* ---------- Intro animée de la carte ---------- */
+  (function () {
+    var pour = document.getElementById('pour');
+    if (!pour) return;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var beer = pour.querySelector('.beer'), stream = pour.querySelector('.stream');
+    var foamTop = pour.querySelector('.foam-top'), glass = pour.querySelector('.glass-wrap');
+    var lines = Array.prototype.slice.call(pour.querySelectorAll('.pour-line'));
+    var TOP = 22, BOTTOM = 302, ticking = false, last = -1;
+    function apply(p) {
+      var fill = Math.min(1, p / 0.78);
+      var level = BOTTOM - (BOTTOM - TOP - 6) * fill;
+      beer.setAttribute('y', level.toFixed(1));
+      var pouring = p > 0.01 && fill < 1;
+      stream.setAttribute('height', pouring ? Math.max(0, level + 40).toFixed(1) : '0');
+      foamTop.style.opacity = fill > 0.92 ? String(Math.min(1, (fill - 0.92) / 0.08)) : '0';
+      foamTop.style.transform = fill > 0.92 ? 'scale(1)' : 'scale(.6)';
+      pour.style.setProperty('--p', p.toFixed(3));
+      glass.style.setProperty('--fill', fill.toFixed(3));
+      var stage = Math.min(lines.length - 1, Math.floor(p * lines.length * 0.999));
+      if (stage !== last) { lines.forEach(function (l, i) { l.classList.toggle('on', i === stage); }); last = stage; }
+    }
+    function update() {
+      ticking = false;
+      var total = pour.offsetHeight - window.innerHeight;
+      var p = total > 0 ? Math.min(1, Math.max(0, -pour.getBoundingClientRect().top / total)) : 1;
+      apply(p);
+    }
+    if (reduce) { apply(1); lines.forEach(function (l, i) { l.classList.toggle('on', i === 0); }); return; }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  /* ---------- Démarrage (après la définition des rendus) ---------- */
+  observeReveal();
+  setTimeout(function () { document.querySelectorAll('.reveal').forEach(function (e) { e.classList.add('in'); }); }, 3000);
+
+  var cached = store(CACHE_KEY);
+  if (cached) render(cached);
+  fetchAll()
+    .then(function (d) { store(CACHE_KEY, d); render(d); })
+    .catch(function () { if (!cached) fallback().then(render).catch(hideLoader); });
+
 })();
