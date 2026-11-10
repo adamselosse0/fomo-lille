@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Back-office — FOMO</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B7A5E'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-weight='900' font-size='38' text-anchor='middle' fill='%23FF7443'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<style>
+  :root{--teal:#0B7A5E;--teal-deep:#075A45;--coral:#FF7443;--coral-ink:#B83E15;--shadow:#5B2412;--cream:#FFF4E6;--paper:#fff;--ink:#1D1B18;--muted:#5E5850;--line:#E3DACD;--danger:#B42318}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-size:16px;line-height:1.5}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .brand{font-family:"Titan One",sans-serif;color:var(--coral);text-shadow:3px 3px 0 var(--shadow);font-size:30px;text-decoration:none;letter-spacing:.04em}
+  header{background:var(--teal);color:#fff;border-bottom:3px solid var(--teal-deep)}
+  .bar{max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .bar .who{display:flex;align-items:center;gap:12px;font-size:14px}
+  main{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+  h1{font-family:"Titan One",sans-serif;font-weight:400;font-size:34px;margin:0 0 6px}
+  h2{font-size:22px;margin:0}
+  .muted{color:var(--muted)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);font-weight:800;font-size:14px;letter-spacing:.03em;cursor:pointer;text-decoration:none}
+  .btn:hover{background:#FFF0E6}
+  .btn-coral{background:var(--coral)}
+  .btn-coral:hover{background:#ff8a5f}
+  .btn-teal{background:var(--teal);color:#fff;border-color:var(--teal-deep)}
+  .btn-teal:hover{background:var(--teal-deep)}
+  .btn-ghost{border-color:transparent;background:transparent}
+  .btn-ghost:hover{background:rgba(0,0,0,.06)}
+  .btn-danger{color:var(--danger);border-color:var(--danger);background:var(--paper)}
+  .btn-sm{min-height:36px;padding:0 12px;font-size:13px}
+  .icon-btn{min-width:36px;min-height:36px;padding:0;border-radius:10px}
+  header .btn{border-color:#fff;background:transparent;color:#fff}
+  header .btn:hover{background:var(--teal-deep)}
+
+  .login{max-width:420px;margin:64px auto;background:var(--paper);border:2px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:32px}
+  label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+  input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=url],textarea,select{width:100%;min-height:44px;padding:8px 12px;border:2px solid #CFC5B6;border-radius:10px;background:#fff}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal)}
+  :focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+  textarea{min-height:80px;resize:vertical}
+  .err{color:var(--danger);font-weight:700;margin:12px 0 0;min-height:1.5em}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 26px}
+  .tab{min-height:46px;padding:0 20px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);font-weight:800;cursor:pointer}
+  .tab[aria-selected=true]{background:var(--coral)}
+  .panel{display:none}.panel.on{display:block}
+
+  .box{background:var(--paper);border:2px solid var(--ink);border-radius:18px;padding:20px;margin-bottom:18px}
+  .box-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px;margin-top:6px}
+  .fields .wide{grid-column:span 2}.fields .full{grid-column:1/-1}
+  @media (max-width:760px){.fields{grid-template-columns:1fr 1fr}.fields .wide,.fields .full{grid-column:1/-1}}
+  details.sec{background:var(--paper);border:2px solid var(--ink);border-radius:18px;margin-bottom:14px;overflow:hidden}
+  details.sec>summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:800;font-size:18px}
+  details.sec>summary::-webkit-details-marker{display:none}
+  details.sec>summary .count{font-weight:600;font-size:14px;color:var(--muted)}
+  details.sec[open]>summary{border-bottom:2px solid var(--line)}
+  .sec-body{padding:16px 20px 20px}
+  .fam{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-deep);background:#E3F1EC;border-radius:999px;padding:4px 10px;margin-right:10px}
+
+  .items{width:100%;border-collapse:collapse;margin-top:14px}
+  .items th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 6px;border-bottom:2px solid var(--line)}
+  .items td{padding:6px;vertical-align:middle;border-bottom:1px dashed var(--line)}
+  .items input[type=text],.items input[type=number]{min-height:38px;padding:6px 8px}
+  .items .num{width:86px}
+  .items .chk{text-align:center}
+  .items input[type=checkbox]{width:20px;height:20px;accent-color:var(--teal)}
+  .items tr.off td{opacity:.6}
+  .scroll{overflow-x:auto}
+  .row-actions{display:flex;gap:4px;justify-content:flex-end;white-space:nowrap}
+
+  .score-btns{display:flex;gap:4px;align-items:center}
+  .score-btns input{width:64px;text-align:center}
+
+  .hours-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:10px}
+  .switch{display:flex;align-items:center;gap:10px;font-weight:700;margin-top:14px}
+  .switch input{width:22px;height:22px;accent-color:var(--teal)}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;opacity:0;transition:.2s;z-index:100;pointer-events:none}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+  .toast.bad{background:var(--danger)}
+  .hidden{display:none!important}
+  .help{background:#E3F1EC;border-radius:14px;padding:14px 18px;margin-bottom:20px;font-size:15px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="brand" href="index.html">FOMO</a>
+    <div class="who hidden" id="who"><span id="who-email"></span><a class="btn btn-sm" href="index.html" target="_blank" rel="noopener">Voir le site</a><button class="btn btn-sm" type="button" id="logout">Déconnexion</button></div>
+  </div>
+</header>
+
+<main>
+  <!-- Connexion -->
+  <section class="login hidden" id="login-view" aria-labelledby="login-t">
+    <h1 id="login-t">Back-office</h1>
+    <p class="muted">Connecte-toi pour modifier la carte, les événements, les scores et les infos du bar.</p>
+    <form id="login-form" novalidate>
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <p class="err" id="login-err" role="alert"></p>
+      <button class="btn btn-coral" type="submit" style="width:100%;margin-top:6px">Se connecter</button>
+    </form>
+  </section>
+
+  <section class="login hidden" id="denied-view">
+    <h1>Accès refusé</h1>
+    <p class="muted">Ce compte n’a pas les droits d’administration du site. Demande à ce qu’il soit ajouté comme administrateur.</p>
+    <button class="btn" type="button" id="logout2">Se déconnecter</button>
+  </section>
+
+  <!-- Tableau de bord -->
+  <section class="hidden" id="app-view">
+    <h1>Back-office du FOMO</h1>
+    <p class="muted">Chaque modification est enregistrée automatiquement et visible tout de suite sur le site.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-panel="p-carte">La carte</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-events">Événements</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-scores">Scores</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-infos">Infos &amp; horaires</button>
+    </div>
+
+    <div class="panel on" id="p-carte">
+      <div class="help">Clique sur une rubrique pour l’ouvrir. Décoche « Dispo » pour afficher une boisson comme épuisée sans la supprimer. Le champ « Prix texte » remplace les prix (ex. « Offerts »).</div>
+      <div id="sections"></div>
+      <button class="btn btn-teal" type="button" id="add-section">+ Nouvelle rubrique</button>
+    </div>
+
+    <div class="panel" id="p-events">
+      <div class="help">Mets une date pour un événement ponctuel (il disparaît du site le lendemain), ou laisse la date vide et remplis « Récurrence » (ex. « Tous les jeudis »). Décoche « Publié » pour préparer un événement sans l’afficher.</div>
+      <div id="events"></div>
+      <button class="btn btn-teal" type="button" id="add-event">+ Nouvel événement</button>
+    </div>
+
+    <div class="panel" id="p-scores">
+      <div class="box">
+        <div class="box-head"><h2>Réglages des classements</h2></div>
+        <label class="switch"><input type="checkbox" id="scores-demo"> Afficher le bandeau « Classement de démonstration »</label>
+        <div class="fields">
+          <div class="wide"><label for="chess-rule">Règle affichée, échecs</label><input type="text" id="chess-rule"></div>
+          <div class="wide"><label for="darts-rule">Règle affichée, fléchettes</label><input type="text" id="darts-rule"></div>
+        </div>
+      </div>
+      <div id="scores"></div>
+    </div>
+
+    <div class="panel" id="p-infos">
+      <div class="box">
+        <h2>Bandeau d’annonce</h2>
+        <p class="muted">Un message court affiché en haut de toutes les pages (ex. « Fermé exceptionnellement ce lundi »). Laisse vide pour le masquer.</p>
+        <input type="text" id="announcement" aria-label="Texte du bandeau d’annonce">
+      </div>
+      <div class="box">
+        <h2>Contact</h2>
+        <div class="fields">
+          <div><label for="phone">Téléphone</label><input type="text" id="phone"></div>
+          <div><label for="cemail">E-mail</label><input type="email" id="cemail"></div>
+          <div><label for="insta">Compte Instagram</label><input type="text" id="insta"></div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-head"><h2>Horaires</h2><button class="btn btn-sm btn-teal" type="button" id="add-hour">+ Ajouter une ligne</button></div>
+        <p class="muted">Ex. « Mardi – Jeudi » / « 17h – 1h ». S’il n’y a aucune ligne, le site renvoie vers Instagram.</p>
+        <div id="hours"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js?v=3"></script>
+<script src="assets/js/admin.js?v=3"></script>
+</body>
+</html>
