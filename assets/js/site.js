@@ -2,6 +2,7 @@
 (function () {
   'use strict';
 
+  document.documentElement.classList.add('js');
   var CFG = window.FOMO_CONFIG;
   var CACHE_KEY = 'fomo-data-v1';
   var page = document.body.getAttribute('data-page');
@@ -97,6 +98,9 @@
     observeReveal();
     hideLoader();
   }
+
+  observeReveal();
+  setTimeout(function () { document.querySelectorAll('.reveal').forEach(function (e) { e.classList.add('in'); }); }, 3000);
 
   var cached = store(CACHE_KEY);
   if (cached) render(cached);

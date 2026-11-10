@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://adamselosse0.github.io/fomo-lille/"
-VERSION = "3"
+VERSION = "4"
 
 NAV = [
     ("index.html", "Accueil", "accueil"),
