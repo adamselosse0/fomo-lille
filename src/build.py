@@ -36,6 +36,7 @@ def head(title, desc, path):
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#0B7A5E">
+<script>document.documentElement.classList.add('js')</script>
 <link rel="canonical" href="{SITE}{'' if path == 'index.html' else path}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
